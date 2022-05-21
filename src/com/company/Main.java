@@ -1,106 +1,141 @@
 package com.company;
 
+import com.company.DataBase;
+import com.company.bank.bankaccount.BankAccount;
+import com.company.bank.bankaccount.ServiceBankAccount;
+import com.company.bank.card.Card;
+import com.company.bank.card.ServiceCard;
+import com.company.user.ServiceUser;
+import com.company.user.User;
+
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class Main {
 
     public static void main(String[] args) {
 
-        /*creating a new Database*/
-        DataBase db = DataBase.getInstance();
+//        User u = new User("mattia", "iojica", "1", "sasaa@gmmail", "2041294101", "m");
+//        BankAccount b = new BankAccount();
+//        ServiceBankAccount serviceBankAccount = new ServiceBankAccount();
+//        serviceBankAccount.addBankAccount(b);
+//
+//        serviceBankAccount.showAccount(b);
+//        serviceBankAccount.deposit(b, 500);
+//        serviceBankAccount.showAccount(b);
+//
+//
+//        serviceBankAccount.showTransactions(b);
 
-        /*loading the data from file*/
-        db.loadDataFromFile("BankAccountsList.txt");
+//        DataBase dataBase = DataBase.getInstance();
+//
+//        dataBase.loadDataFromFile();
+        ServiceUser serviceUser = ServiceUser.getInstance();
+        serviceUser = readUsersFromFile();
 
-        /*printing the loaded data*/
-//        db.printBankAccounts();
+        ServiceCard serviceCard = ServiceCard.getInstance();
+        serviceCard = readCardsFromFile();
 
-//        System.out.println("---------------------------------------------------------------------");
+        ServiceBankAccount serviceBankAccount = ServiceBankAccount.getInstance();
+        serviceBankAccount = readBankAccountsFromFile(serviceUser, serviceCard);
 
-        /*create new user*/
-        User user1 = new User("Mattia", "Iojica", "5111111111111",
-                "mattia@gmail.com", "07765165151","M");
-
-
-        /*returns the data of the user*/
-        String string = user1.toString();
-        System.out.println(string);
-
-        /*create a student account for the new user which is automatically added into the database*/
-        StudentAccount user1_acc = new StudentAccount(BankAccount.randomNumberGenerator(), BankAccount.randomPinGenerator(), 9999, user1);
-        db.printBankAccounts();
-
-
-        User user2 = new User("Oliver", "kann", "51561321684",
-                "oliverkann@gmail.com", "034524454","M");
-        SavingsAccount user2_acc = new SavingsAccount(user2);
-        /*print the data of the new account*/
-        user2_acc.show_account();
-        System.out.println("---------------------------------------------------------------------");
-
-        /*new user using the data provided in the console*/
-//        User newUser = new User();
-        /*the users are not saved into the database
-        for this we must create an account at out choice*/
-//        CurrentAccount newCurrentAccount = new CurrentAccount(newUser);
-        /*now the data is stored into the database*/
-//        db.printBankAccounts();
-
-        /*ALL THE TRANSACTIONS, DEPOSITS, AND WITHDRAWALS ARE UPDATED INTO THE DATABASE*/
-
-        /*------ DEPOSIT -------*/
-        /*we can pass the amount or write it into the console*/
-
-        /*passing the amount*/
-        System.out.println("\nAccount Banalce before deposit: " + user1_acc.getBalance());
-        user1_acc.deposit(1);
-        System.out.println("Account Banalce after deposit: " + user1_acc.getBalance());
-
-        /*writing the amount*/
-//        System.out.println("Account Banalce before deposit: " + user1_acc.getBalance());
-//        user1_acc.deposit();
-//        System.out.println("Account Banalce after deposit: " + user1_acc.getBalance());
+//        for(int i = 0; i < serviceUser.getUsers().size(); i++){
+//            System.out.println(serviceCard.getCards().get(i).getNumber());
+//        }
+//
+//        for(int i = 0; i < serviceBankAccount.getBankAccounts().size(); i++){
+//            serviceBankAccount.getBankAccounts().get(i).showAccount();
+//        }
 
 
-        /*------ WITHDRAW -------*/
-        /*we can pass the amount or write it into the console*/
+        for(int i = 0; i < serviceUser.getUsers().size(); i++){
+            serviceUser.addBankAccountToUser(serviceUser.getUsers().get(i), serviceBankAccount.getBankAccounts().get(i));
+        }
 
-        /*passing the amount*/
-        System.out.println("\nAccount Banalce before withdraw: " + user2_acc.getBalance());
-        user2_acc.withdraw(100);
-        System.out.println("Account Banalce after withdraw: " + user2_acc.getBalance());
+//        for(int i = 0; i < serviceBankAccount.getBankAccounts().size(); i++){
+//            System.out.println(serviceBankAccount.getBankAccounts().get(i).getCardList().size());
+//        }
 
-        /*writing the amount*/
-//        System.out.println("\nAccount Banalce before withdraw: " + user2_acc.getBalance());
-//        user2_acc.withdraw();
-//        System.out.println("Account Banalce after withdraw: " + user2_acc.getBalance());
+        for(int i = 0; i < serviceUser.getUsers().size(); i++){
+            System.out.println(serviceUser.getUsers().get(i).getBankAccounts().get(0).getCardList().get(0).getNumber());
+        }
+    }
 
-        /*------ TRANSFER -------*/
+    private static ServiceUser readUsersFromFile() {
 
-        /*we can transfer to an specific user by passing the amount or writing it into the console*/
+        ServiceUser serviceUser = ServiceUser.getInstance();
+        try {
+            BufferedReader in = new BufferedReader(new FileReader("userData.csv"));
+            String str;
+            Double balance;
 
-        /*passing the amount*/
-        System.out.println("\nUser1 Balance before: " + user1_acc.getBalance());
-        System.out.println("User2 Balance before: " + user2_acc.getBalance());
-        user1_acc.transfer(user2_acc, 100);
-        System.out.println("\nUser1 Balance after: " + user1_acc.getBalance());
-        System.out.println("User2 Balance after: " + user2_acc.getBalance());
+            while ((str = in.readLine()) != null) {
+                String[] ar = str.split(",");
+                User u = new User(ar[0], ar[1], ar[2], ar[3], ar[4], ar[5]);
+                serviceUser.addUser(u);
+            }
+            in.close();
+        } catch (
+                IOException e) {
+            System.out.println("File Read Error");
+        }
 
-        /*writing the amount*/
-//        System.out.println("\nUser1 Balance before: " + user1_acc.getBalance());
-//        System.out.println("User2 Balance before: " + user2_acc.getBalance());
-//        user1_acc.transfer(user2_acc);
-//        System.out.println("\nUser1 Balance after: " + user1_acc.getBalance());
-//        System.out.println("User2 Balance after: " + user2_acc.getBalance());
+        return serviceUser;
+    }
 
-        db.printBankAccounts();
+    private static ServiceBankAccount readBankAccountsFromFile(ServiceUser serviceUser, ServiceCard serviceCard) {
 
+        int i = 0;
+        ServiceBankAccount serviceBankAccount = new ServiceBankAccount().getInstance();
+        try {
+            BufferedReader in = new BufferedReader(new FileReader("bankData.csv"));
+            String str;
 
-        /*LET'S EMPTY ALL THE ACCOUNTS :D */
-        for(var back_acc : db.bankAccounts)
-            back_acc.withdraw(back_acc.getBalance());
+            while ((str = in.readLine()) != null) {
+                List<Card>cards = new ArrayList<>();
+                cards.add(serviceCard.getCards().get(i));
+                double amount = Double.parseDouble(str);
+//                System.out.println(Arrays.toString(ar));
+                BankAccount bankAccount = new BankAccount(amount, serviceUser.getUsers().get(i), (ArrayList<Card>) cards);
+//                serviceBankAccount.addCardToBankAccount(bankAccount, serviceCard.getCards().get(i));
+                serviceBankAccount.addBankAccount(bankAccount);
+//                System.out.println(serviceBankAccount.getBankAccounts().get(i).getCardList().size());
+                i++;
+            }
+            in.close();
+        } catch (
+                IOException e) {
+            System.out.println("File Read Error");
+        }
 
-        System.out.println("---------------------------------------------------------------------\n");
+        return serviceBankAccount;
+    }
 
+    private static ServiceCard readCardsFromFile() {
 
-        db.printBankAccounts();
+        ServiceCard serviceCard = ServiceCard.getInstance();
+
+        try {
+            BufferedReader in = new BufferedReader(new FileReader("cardData.csv"));
+            String str;
+
+            while ((str = in.readLine()) != null) {
+                String[] ar = str.split(",");
+//                System.out.println(Arrays.toString(ar));
+                Card card = new Card(ar[0], ar[1], ar[2]);
+                serviceCard.addCard(card);
+            }
+            in.close();
+        } catch (
+                IOException e) {
+            System.out.println("File Read Error");
+        }
+
+        return serviceCard;
     }
 }
