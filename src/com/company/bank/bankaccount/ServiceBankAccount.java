@@ -5,125 +5,75 @@ import com.company.bank.card.Card;
 import com.company.bank.transactions.Transaction;
 import com.company.user.User;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class ServiceBankAccount {
 
     private List<BankAccount> bankAccounts = new ArrayList<>();
-    private static ServiceBankAccount instance;
+    private static BankAccountSingleton instance;
 
 
-    public ServiceBankAccount(){
-    }
-
-    public static ServiceBankAccount getInstance() {
-        if(instance == null)
-            instance = new ServiceBankAccount();
+    public static BankAccountSingleton getInstance() {
+        if (instance == null)
+            instance = new BankAccountSingleton();
         return instance;
     }
 
+
+    public void setBankAccounts(List<BankAccount> bankAccounts) {
+        this.bankAccounts = bankAccounts;
+    }
 
     public List<BankAccount> getBankAccounts() {
         return bankAccounts;
     }
 
-    public BankAccount getBankAccountByUser(User user){
-        for (int i = 0; i < this.bankAccounts.size(); ++i)
-            if (this.bankAccounts.get(i).getUser().equals(user))
-                return this.bankAccounts.get(i);
+    private static List<String[]> getDataFromFile(String fileName){
 
-        return null;
+        List<String[]> str = new ArrayList<>();
+
+        try(BufferedReader in = new BufferedReader(new FileReader(fileName))) {
+
+            String l;
+            while((l = in.readLine()) != null ) {
+                String[] ar = l.replaceAll(" ", "").split(",");
+                str.add(ar);
+            }
+        } catch (IOException e) {
+            System.out.println("No bank accounts found!");
+        }
+
+        return str;
     }
 
-    public BankAccount getBankAccountByIBAN(String iban){
-        for (int i = 0; i < this.bankAccounts.size(); ++i)
-            if (this.bankAccounts.get(i).getIBAN().equals(iban))
-                return this.bankAccounts.get(i);
+    public void loadFromFile(){
 
-        return null;
+        List<String[]> str = ServiceBankAccount.getDataFromFile("data/bankAccounts.csv");
+
+        for(String [] ar : str){
+            BankAccount bankAccount = new BankAccount(
+                    ar[0],
+                    Double.parseDouble(ar[1]),
+                    Integer.parseInt(ar[2])
+            );
+            bankAccounts.add(bankAccount );
+        }
+        BankAccountSingleton.incrementId(str.size());
     }
 
-    public void addBankAccount(BankAccount bankAccount){
-        this.bankAccounts.add(bankAccount);
-    }
-
-    public void addCardToBankAccount(BankAccount bankAccount, Card card){
-        List<Card> cards = new ArrayList<>();
-        cards.addAll(bankAccount.getCardList());
-        cards.add(card);
-        bankAccount.setCardList(cards);
-    }
-
-    public void deposit(BankAccount bankAccount, double amount)
-    {
-        bankAccount.setBalance(bankAccount.getBalance() + amount);
-
-        List<Transaction> transactions = new ArrayList<>();
-
-        transactions.addAll(bankAccount.getTransactions());
-        Transaction t = new Transaction("---", bankAccount.getIBAN(), amount, "Deposit");
-        transactions.add(t);
-        bankAccount.setTransactions(transactions);
-    }
-
-    boolean transfer(BankAccount from, BankAccount to, double amount){
-        if(from.getBalance() < amount)
-            return false;
-
-        from.setBalance(from.getBalance() - amount);
-        to.setBalance(to.getBalance() + amount);
-
-        List<Transaction> transactionsTo = new ArrayList<>();
-        List<Transaction> transactionsFrom = new ArrayList<>();
-
-        transactionsTo.addAll(to.getTransactions());
-        transactionsFrom.addAll(from.getTransactions());
-        Transaction t = new Transaction(from.getIBAN(), to.getIBAN(), amount, "Transfer");
-        transactionsTo.add(t);
-        transactionsFrom.add(t);
-        to.setTransactions(transactionsTo);
-        from.setTransactions(transactionsFrom);
-
-        return true;
-    }
-
-    public boolean withdraw(BankAccount bankAccount, double amount){
-        if (bankAccount.getBalance() < amount)
-            return false;
-
-        bankAccount.setBalance(bankAccount.getBalance() - amount);
-
-        List<Transaction> transactions = new ArrayList<>();
-
-        transactions.addAll(bankAccount.getTransactions());
-        Transaction t = new Transaction(bankAccount.getIBAN(),"---", amount, "Withdraw");
-        transactions.add(t);
-        bankAccount.setTransactions(transactions);
-
-        return true;
-    }
-
-
-    public void showAccount(BankAccount bankAccount){
-        System.out.println("Account Holder Name: " + bankAccount.getUser().getFirstName() + " " + bankAccount.getUser().getLastName());
-        System.out.println("Account IBAN: " + bankAccount.getIBAN());
-        System.out.println("Account Balance: " + bankAccount.getBalance());
-    }
-
-    public void showCards(BankAccount bankAccount){
-
-    }
-
-    public void showTransactions(BankAccount bankAccount){
-
-        for(int i = 0; i < bankAccount.getTransactions().size(); i++){
-                System.out.println("From: " + bankAccount.getTransactions().get(i).getFrom());
-                System.out.println("To: " + bankAccount.getTransactions().get(i).getTo());
-                System.out.println("Amount: " + bankAccount.getTransactions().get(i).getAmount());
-                System.out.println("Description: " + bankAccount.getTransactions().get(i).getDescriprion());
-                System.out.println("Date: " + bankAccount.getTransactions().get(i).getDate());
-                System.out.println();
+    public void uploadToFile(){
+        try {
+            Writer writer = new FileWriter("data/bankAccounts.csv");
+            for(BankAccount bankAccount : this.bankAccounts){
+                writer.write(bankAccount.toFile());
+                writer.write('\n');
+            }
+            writer.close();
+        }catch (IOException e){
+            System.out.println(e.toString());
         }
     }
 

@@ -1,45 +1,51 @@
 package com.company.bank.bankaccount;
 
 import com.company.bank.card.Card;
+import com.company.bank.card.CardSingleton;
 import com.company.bank.transactions.Transaction;
 import com.company.user.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
-public class BankAccount{
+public class BankAccount implements  Comparator<Transaction> {
     protected String IBAN;
     protected double balance;
-    protected User user;
+    protected int ownerId;
 
     protected List<Card> cardList = new ArrayList<>();
-    protected List<Transaction> transactions = new ArrayList<>();
+    private final CardSingleton cardSingleton = new CardSingleton();
+    static private final Set<String> usedNumbers = new HashSet<>();
 
-    public BankAccount(){
+    public BankAccount(String IBAN, double balance, int ownerId){
+        this.IBAN = IBAN;
+        this.balance = balance;
+        this.ownerId = ownerId;
     }
 
-    public BankAccount(User user){
-        this.user = user;
+    public BankAccount(String name, int ownerId) {
         this.IBAN = randomIBANGenerator();
+
+        while(usedNumbers.contains(this.IBAN))
+            this.IBAN = randomIBANGenerator();
+        usedNumbers.add(this.IBAN);
+
         this.balance = 0;
+        this.ownerId = ownerId;
     }
 
-    public BankAccount(double balance, User user){
-        this.IBAN = randomIBANGenerator();
-        this.balance = balance;
-        this.user = user;
-        Card card = new Card();
-        this.cardList.add(card);
+    public BankAccount(ResultSet in) throws SQLException {
+        this.IBAN = in.getString("IBAN");
+        this.balance = in.getDouble("balance");
+        this.ownerId = in.getInt("ownerId");
     }
 
-    public BankAccount(double balance, User user, ArrayList<Card> cardList){
-        this.IBAN = randomIBANGenerator();
-        this.balance = balance;
-        this.user = user;
-        this.cardList = cardList;
-    }
 
+    public void addCard(){
+        Card card = cardSingleton.addCard(this.IBAN);
+        cardList.add(card);
+    }
 
     //getters and setters
 
@@ -56,12 +62,8 @@ public class BankAccount{
         return cardList;
     }
 
-    public List<Transaction> getTransactions() {
-        return transactions;
-    }
-
-    public User getUser() {
-        return user;
+    public int getOwnerId() {
+        return ownerId;
     }
 
     public void setIBAN(String IBAN) {
@@ -76,12 +78,8 @@ public class BankAccount{
         this.cardList = cardList;
     }
 
-    public void setTransactions(List<Transaction> transactions) {
-        this.transactions = transactions;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public void setOwnerId(int ownerId) {
+        this.ownerId = ownerId;
     }
 
     static private String randomIBANGenerator(){
@@ -96,9 +94,37 @@ public class BankAccount{
         return code;
     }
 
-    public void showAccount(){
-        System.out.println("Account Holder Name: " + this.user.getFirstName() + " " + this.user.getLastName());
-        System.out.println("Account Number: " + this.getIBAN());
-        System.out.println("Account Balance: " + this.getBalance());
+    public List<Transaction> transactionFilter(List<Transaction> transactions){
+        List<Transaction> transactionList = new ArrayList<>();
+
+        for(Transaction t : transactions){
+            if(t.getFrom().equals(this.IBAN)){
+                transactionList.add(t);
+            }
+        }
+
+        return transactionList;
+    }
+
+
+    @Override
+    public String toString() {
+        return "BankAccount{" +
+                "IBAN='" + IBAN + '\'' +
+                ", balance=" + balance +
+                ", ownerId=" + ownerId +
+                ", cardList=" + cardList +
+                '}';
+    }
+
+    public String toFile(){
+        return IBAN +
+                "," + balance +
+                "," + ownerId;
+    }
+
+    @Override
+    public int compare(Transaction o1, Transaction o2) {
+        return o1.getDate().compareTo(o2.getDate());
     }
 }
