@@ -11,9 +11,9 @@ public class ServiceAudit {
 
     public void appendCommand(String command) throws IOException {
         fileWriter.append(command);
-        fileWriter.append(",");
+        fileWriter.append(',');
         fileWriter.append(dateTimeFormatter.format(LocalDateTime.now()));
-        fileWriter.append("\n");
+        fileWriter.append('\n');
         fileWriter.flush();
     }
 

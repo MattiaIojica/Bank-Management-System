@@ -24,7 +24,7 @@ public class BankAccount implements  Comparator<Transaction> {
         this.ownerId = ownerId;
     }
 
-    public BankAccount(String name, int ownerId) {
+    public BankAccount(int ownerId) {
         this.IBAN = randomIBANGenerator();
 
         while(usedNumbers.contains(this.IBAN))

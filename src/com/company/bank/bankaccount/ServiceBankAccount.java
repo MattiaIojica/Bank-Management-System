@@ -61,7 +61,6 @@ public class ServiceBankAccount {
             );
             bankAccounts.add(bankAccount );
         }
-        BankAccountSingleton.incrementId(str.size());
     }
 
     public void uploadToFile(){

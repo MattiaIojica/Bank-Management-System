@@ -69,6 +69,10 @@ public class User {
         this.sex = in.nextLine();
     }
 
+    public int getId() {
+        return id;
+    }
+
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
@@ -95,10 +99,6 @@ public class User {
 
     public void setSex(String sex) {
         this.sex = sex;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public String getFirstName() {

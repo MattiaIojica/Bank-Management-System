@@ -78,6 +78,6 @@ public class Transaction {
                 "," + to +
                 "," + amount +
                 "," + description +
-                "," + (new SimpleDateFormat("yyyy-MM-dd h:m:s")).format(date);
+                "," + (new SimpleDateFormat("yyyy-MM-dd+HH:mm:ss")).format(date);
     }
 }

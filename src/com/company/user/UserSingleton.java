@@ -11,11 +11,11 @@ public class UserSingleton {
         UserSingleton.id = UserSingleton.id + number;
     }
 
-    public User createUser(Scanner in) throws ParseException {
-        return new User(id++, in);
+    public User createUser(Scanner cin) throws ParseException {
+        return new User(id++, cin);
     }
 
-    public User createUser(ResultSet in) throws SQLException {
-        return new User(id++, in);
+    public User createUser(ResultSet cin) throws SQLException {
+        return new User(id++, cin);
     }
 }

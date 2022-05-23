@@ -31,7 +31,7 @@ public class BankAccountDatabase {
 
     public void update(BankAccount bankAccount){
         try{
-            String query = "UPDATE Accounts SET balance = ?, ownerId = ? WHERE IBAN = ?";
+            String query = "UPDATE BankAccounts SET balance = ?, ownerId = ? WHERE IBAN = ?";
             PreparedStatement preparedStmt = connection.prepareStatement(query);
             preparedStmt.setDouble(1, bankAccount.getBalance());
             preparedStmt.setInt(2, bankAccount.getOwnerId());
@@ -45,7 +45,7 @@ public class BankAccountDatabase {
 
     public void create(BankAccount bankAccount){
         try{
-            String query = "INSERT INTO Accounts (IBAN, balance, ownerId) VALUES (?, ?, ?)";
+            String query = "INSERT INTO BankAccounts (IBAN, balance, ownerId) VALUES (?, ?, ?)";
             PreparedStatement preparedStmt = connection.prepareStatement(query);
             preparedStmt.setString(1, bankAccount.getIBAN());
             preparedStmt.setDouble(2, bankAccount.getBalance());
