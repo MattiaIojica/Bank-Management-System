@@ -34,11 +34,11 @@ public class Transaction {
     }
 
     public Transaction(ResultSet cin) throws SQLException {
-        this.from = cin.getString("from");
-        this.to = cin.getString("to");
+        this.from = cin.getString("fromIBAN");
+        this.to = cin.getString("toIBAN");
         this.amount = cin.getDouble("amount");
         this.description = cin.getString("description");
-        this.date = cin.getDate("date");
+        this.date = cin.getDate("dateT");
     }
 
     public String getFrom() {

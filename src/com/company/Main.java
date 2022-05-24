@@ -16,7 +16,7 @@ public class Main {
 
     static List<String> commands = Arrays.asList("Create new user", "Print user", "Delete user", "Create Bank account",
             "Close Bank Account", "Create card", "Print User's Bank Accounts", "Create Transaction", "Deposit Money",
-            "Withdraw Money", "Check Balance", "Stop!");
+            "Withdraw Money", "Check Balance", "Print User Transactions", "Stop!");
 
 
     public static Connection getConnection() {

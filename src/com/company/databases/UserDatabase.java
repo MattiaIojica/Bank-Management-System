@@ -16,6 +16,25 @@ public class UserDatabase {
         this.connection = connection;
     }
 
+    public void create(User user){
+        try{
+            String query = "INSERT INTO Users (id, firstName, lastName, CNP, email, phoneNo, birthDate, sex) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setInt(1, user.getId());
+            prepareStatement.setString(2, user.getFirstName());
+            prepareStatement.setString(3, user.getLastName());
+            prepareStatement.setString(4, user.getCNP());
+            prepareStatement.setString(5, user.getEmail());
+            prepareStatement.setString(6, user.getPhoneNo());
+            prepareStatement.setString(7, (new SimpleDateFormat("yyyy-MM-dd")).format(user.getBirthDate()));
+            prepareStatement.setString(8, user.getSex());
+            prepareStatement.execute();
+            prepareStatement.close();
+        }catch (Exception e){
+            System.out.println(e.toString());
+        }
+    }
+
     public List<User> read(){
         List<User> users = new ArrayList<>();
         try{
@@ -51,24 +70,6 @@ public class UserDatabase {
         }
     }
 
-    public void create(User user){
-        try{
-            String query = "INSERT INTO Users (id, firstName, lastName, CNP, email, phoneNo, birthDate, sex) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
-            prepareStatement.setInt(1, user.getId());
-            prepareStatement.setString(2, user.getFirstName());
-            prepareStatement.setString(3, user.getLastName());
-            prepareStatement.setString(4, user.getCNP());
-            prepareStatement.setString(5, user.getEmail());
-            prepareStatement.setString(6, user.getPhoneNo());
-            prepareStatement.setString(7, (new SimpleDateFormat("yyyy-MM-dd")).format(user.getBirthDate()));
-            prepareStatement.setString(8, user.getSex());
-            prepareStatement.execute();
-            prepareStatement.close();
-        }catch (Exception e){
-            System.out.println(e.toString());
-        }
-    }
 
     public void delete(User user){
         try{

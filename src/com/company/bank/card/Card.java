@@ -25,7 +25,7 @@ public class Card {
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
-        calendar.add(Calendar.YEAR, 3);
+        calendar.add(Calendar.YEAR, 4);
         this.expirationDate = calendar.getTime();
     }
 

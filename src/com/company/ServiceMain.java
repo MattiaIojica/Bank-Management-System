@@ -208,6 +208,8 @@ public class ServiceMain {
         Transaction transaction = new Transaction(from, to, amount, description);
         this.transactions.add(transaction);
 
+        System.out.println(transaction.toString());
+
         if(this.transactionDatabase != null)
             this.transactionDatabase.create(transaction);
 
@@ -233,7 +235,7 @@ public class ServiceMain {
 
         for(BankAccount b : userBankAccounts)
             for(Transaction t : transactions){
-                if(t.getFrom() == b.getIBAN())
+                if(t.getFrom().equals(b.getIBAN()))
                     System.out.println(t.toString());
             }
     }

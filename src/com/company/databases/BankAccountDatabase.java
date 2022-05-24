@@ -12,6 +12,20 @@ public class BankAccountDatabase {
         this.connection = connection;
     }
 
+    public void create(BankAccount bankAccount){
+        try{
+            String query = "INSERT INTO BankAccounts (IBAN, balance, ownerId) VALUES (?, ?, ?)";
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setString(1, bankAccount.getIBAN());
+            prepareStatement.setDouble(2, bankAccount.getBalance());
+            prepareStatement.setInt(3, bankAccount.getOwnerId());
+            prepareStatement.execute();
+            prepareStatement.close();
+        }catch (Exception e){
+            System.out.println(e.toString());
+        }
+    }
+
     public List<BankAccount> read(){
         List<BankAccount> bankAccounts = new ArrayList<>();
 
@@ -43,19 +57,6 @@ public class BankAccountDatabase {
         }
     }
 
-    public void create(BankAccount bankAccount){
-        try{
-            String query = "INSERT INTO BankAccounts (IBAN, balance, ownerId) VALUES (?, ?, ?)";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
-            prepareStatement.setString(1, bankAccount.getIBAN());
-            prepareStatement.setDouble(2, bankAccount.getBalance());
-            prepareStatement.setInt(3, bankAccount.getOwnerId());
-            prepareStatement.execute();
-            prepareStatement.close();
-        }catch (Exception e){
-            System.out.println(e.toString());
-        }
-    }
 
     public void delete(BankAccount bankAccount){
         try{
