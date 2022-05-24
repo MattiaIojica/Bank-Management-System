@@ -32,12 +32,12 @@ public class BankAccountDatabase {
     public void update(BankAccount bankAccount){
         try{
             String query = "UPDATE BankAccounts SET balance = ?, ownerId = ? WHERE IBAN = ?";
-            PreparedStatement preparedStmt = connection.prepareStatement(query);
-            preparedStmt.setDouble(1, bankAccount.getBalance());
-            preparedStmt.setInt(2, bankAccount.getOwnerId());
-            preparedStmt.setString(3, bankAccount.getIBAN());
-            preparedStmt.executeUpdate();
-            preparedStmt.close();
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setDouble(1, bankAccount.getBalance());
+            prepareStatement.setInt(2, bankAccount.getOwnerId());
+            prepareStatement.setString(3, bankAccount.getIBAN());
+            prepareStatement.executeUpdate();
+            prepareStatement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }
@@ -46,12 +46,12 @@ public class BankAccountDatabase {
     public void create(BankAccount bankAccount){
         try{
             String query = "INSERT INTO BankAccounts (IBAN, balance, ownerId) VALUES (?, ?, ?)";
-            PreparedStatement preparedStmt = connection.prepareStatement(query);
-            preparedStmt.setString(1, bankAccount.getIBAN());
-            preparedStmt.setDouble(2, bankAccount.getBalance());
-            preparedStmt.setInt(3, bankAccount.getOwnerId());
-            preparedStmt.execute();
-            preparedStmt.close();
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setString(1, bankAccount.getIBAN());
+            prepareStatement.setDouble(2, bankAccount.getBalance());
+            prepareStatement.setInt(3, bankAccount.getOwnerId());
+            prepareStatement.execute();
+            prepareStatement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }
@@ -60,10 +60,10 @@ public class BankAccountDatabase {
     public void delete(BankAccount bankAccount){
         try{
             String query = "DELETE FROM BankAccounts WHERE IBAN = ?";
-            PreparedStatement preparedStmt = connection.prepareStatement(query);
-            preparedStmt.setString(1, bankAccount.getIBAN());
-            preparedStmt.execute();
-            preparedStmt.close();
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setString(1, bankAccount.getIBAN());
+            prepareStatement.execute();
+            prepareStatement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }

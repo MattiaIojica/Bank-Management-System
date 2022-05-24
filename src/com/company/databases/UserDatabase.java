@@ -22,8 +22,8 @@ public class UserDatabase {
             Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery("SELECT * FROM Users");
             while(result.next()) {
-                User current = userSingleton.createUser(result);
-                users.add(current);
+                User user = userSingleton.createUser(result);
+                users.add(user);
             }
             statement.close();
         }catch (Exception e){
@@ -54,17 +54,17 @@ public class UserDatabase {
     public void create(User user){
         try{
             String query = "INSERT INTO Users (id, firstName, lastName, CNP, email, phoneNo, birthDate, sex) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement preparedStmt = connection.prepareStatement(query);
-            preparedStmt.setInt(1, user.getId());
-            preparedStmt.setString(2, user.getFirstName());
-            preparedStmt.setString(3, user.getLastName());
-            preparedStmt.setString(4, user.getCNP());
-            preparedStmt.setString(5, user.getEmail());
-            preparedStmt.setString(6, user.getPhoneNo());
-            preparedStmt.setString(7, (new SimpleDateFormat("yyyy-MM-dd")).format(user.getBirthDate()));
-            preparedStmt.setString(8, user.getSex());
-            preparedStmt.execute();
-            preparedStmt.close();
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setInt(1, user.getId());
+            prepareStatement.setString(2, user.getFirstName());
+            prepareStatement.setString(3, user.getLastName());
+            prepareStatement.setString(4, user.getCNP());
+            prepareStatement.setString(5, user.getEmail());
+            prepareStatement.setString(6, user.getPhoneNo());
+            prepareStatement.setString(7, (new SimpleDateFormat("yyyy-MM-dd")).format(user.getBirthDate()));
+            prepareStatement.setString(8, user.getSex());
+            prepareStatement.execute();
+            prepareStatement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }
@@ -73,10 +73,10 @@ public class UserDatabase {
     public void delete(User user){
         try{
             String query = "DELETE FROM Users WHERE id = ?";
-            PreparedStatement preparedStmt = connection.prepareStatement(query);
-            preparedStmt.setInt(1, user.getId());
-            preparedStmt.execute();
-            preparedStmt.close();
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setInt(1, user.getId());
+            prepareStatement.execute();
+            prepareStatement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }

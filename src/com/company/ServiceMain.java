@@ -180,7 +180,7 @@ public class ServiceMain {
         System.out.println("Receiver (IBAN): ");
         String to = cin.nextLine();
         System.out.println("Amount: ");
-        Double amount = Double.parseDouble(String.valueOf(cin.nextDouble()));
+        double amount = Double.parseDouble(cin.nextLine());
         System.out.println("Description: ");
         String description = cin.nextLine();
 
@@ -277,12 +277,6 @@ public class ServiceMain {
             }
         }
 
-        var newTransaction = new Transaction("", IBAN, amount, "deposit");
-        this.transactions.add(newTransaction);
-        if(this.transactionDatabase!=null)
-            this.transactionDatabase.create(newTransaction);
-
-
         System.out.println("Deposit successfully done!");
 
     }
@@ -333,12 +327,6 @@ public class ServiceMain {
                 }
             }
         }
-
-        var newTransaction = new Transaction("", IBAN, amount, "withdraw");
-        this.transactions.add(newTransaction);
-        if(this.transactionDatabase!=null)
-            this.transactionDatabase.create(newTransaction);
-
 
         System.out.println("Withdraw successfully done!");
 

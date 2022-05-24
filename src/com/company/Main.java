@@ -72,7 +72,6 @@ public class Main {
                     case 10 -> serviceMain.withdrawMoney(cin);
                     case 11 -> serviceMain.checkBalance(cin);
                     case 12 -> serviceMain.getUserTransactions(cin);
-
                     case 13 -> stop = true;
                 }
                 if (command >= 0 && command < 12) {

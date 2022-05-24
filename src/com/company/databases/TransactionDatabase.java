@@ -3,6 +3,7 @@ package com.company.databases;
 import com.company.bank.transactions.Transaction;
 
 import java.sql.*;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -20,58 +21,59 @@ public class TransactionDatabase {
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT * FROM Transactions");
             while(resultSet.next()) {
-                Transaction current = new Transaction(resultSet);
-                transactions.add(current);
+                Transaction transaction = new Transaction(resultSet);
+                transactions.add(transaction);
             }
             statement.close();
-        }catch (Exception e){
-            System.out.println(e.toString());
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return transactions;
     }
 
-    public void update(Transaction newTransaction){
+    public void update(Transaction transaction){
         try{
             String query = "UPDATE Transactions SET description = ? WHERE from = ? AND to = ? AND date = ?";
-            PreparedStatement preparedStmt = connection.prepareStatement(query);
-            preparedStmt.setString(1, newTransaction.getDescription());
-            preparedStmt.setString(2, newTransaction.getFrom());
-            preparedStmt.setString(3, newTransaction.getTo());
-            preparedStmt.setString(4, (new SimpleDateFormat("yyyy-MM-dd h:m:s")).format(newTransaction.getDate()));
-            preparedStmt.executeUpdate();
-            preparedStmt.close();
-        }catch (Exception e){
-            System.out.println(e.toString());
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setString(1, transaction.getDescription());
+            prepareStatement.setString(2, transaction.getFrom());
+            prepareStatement.setString(3, transaction.getTo());
+            prepareStatement.setString(5, (new SimpleDateFormat("yyyy-MM-dd h:m:s")).format(transaction.getDate()));
+            prepareStatement.executeUpdate();
+            prepareStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     public void create(Transaction transaction){
         try{
+
             String query = "INSERT INTO Transactions (from, to, amount, description, date) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement preparedStmt = connection.prepareStatement(query);
-            preparedStmt.setString(1, transaction.getFrom());
-            preparedStmt.setString(2, transaction.getTo());
-            preparedStmt.setDouble(3, transaction.getAmount());
-            preparedStmt.setString(4, transaction.getDescription());
-            preparedStmt.setString(5, (new SimpleDateFormat("yyyy-MM-dd h:m:s")).format(transaction.getDate()));
-            preparedStmt.execute();
-            preparedStmt.close();
-        }catch (Exception e){
-            System.out.println(e.toString());
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setString(1, transaction.getFrom());
+            prepareStatement.setString(2, transaction.getTo());
+            prepareStatement.setDouble(3, transaction.getAmount());
+            prepareStatement.setString(4, transaction.getDescription());
+            prepareStatement.setString(5, (new SimpleDateFormat("YYYY-MM-DD HH:MM:SS")).format(transaction.getDate()));
+            prepareStatement.execute();
+            prepareStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
     public void delete(Transaction transaction){
         try{
             String query = "DELETE FROM Transactions WHERE from = ?, to = ?, date = ?";
-            PreparedStatement preparedStmt = connection.prepareStatement(query);
-            preparedStmt.setString(1, transaction.getFrom());
-            preparedStmt.setString(2, transaction.getTo());
-            preparedStmt.setString(3, (new SimpleDateFormat("yyyy-MM-dd h:m:s")).format(transaction.getDate()));
-            preparedStmt.execute();
-            preparedStmt.close();
-        }catch (Exception e){
-            System.out.println(e.toString());
+            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            prepareStatement.setString(1, transaction.getFrom());
+            prepareStatement.setString(2, transaction.getTo());
+            prepareStatement.setString(3, (new SimpleDateFormat("YYYY-MM-DD HH:MM:SS")).format(transaction.getDate()));
+            prepareStatement.execute();
+            prepareStatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 }
