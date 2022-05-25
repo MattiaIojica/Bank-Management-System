@@ -9,7 +9,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class BankAccount implements  Comparator<Transaction> {
+public class BankAccount {
     protected String IBAN;
     protected double balance;
     protected int ownerId;
@@ -94,18 +94,6 @@ public class BankAccount implements  Comparator<Transaction> {
         return code;
     }
 
-    public List<Transaction> transactionFilter(List<Transaction> transactions){
-        List<Transaction> transactionList = new ArrayList<>();
-
-        for(Transaction t : transactions){
-            if(t.getFrom().equals(this.IBAN)){
-                transactionList.add(t);
-            }
-        }
-
-        return transactionList;
-    }
-
 
     @Override
     public String toString() {
@@ -123,8 +111,4 @@ public class BankAccount implements  Comparator<Transaction> {
                 "," + ownerId;
     }
 
-    @Override
-    public int compare(Transaction o1, Transaction o2) {
-        return o1.getDate().compareTo(o2.getDate());
-    }
 }
