@@ -38,7 +38,7 @@ public class Transaction {
         this.to = cin.getString("toIBAN");
         this.amount = cin.getDouble("amount");
         this.description = cin.getString("description");
-        this.date = cin.getDate("dateT");
+        this.date = cin.getTimestamp("dateT");
     }
 
     public String getFrom() {

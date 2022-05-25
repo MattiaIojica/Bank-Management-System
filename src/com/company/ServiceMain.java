@@ -208,7 +208,7 @@ public class ServiceMain {
         Transaction transaction = new Transaction(from, to, amount, description);
         this.transactions.add(transaction);
 
-        System.out.println(transaction.toString());
+//        System.out.println(transaction.toString());
 
         if(this.transactionDatabase != null)
             this.transactionDatabase.create(transaction);
