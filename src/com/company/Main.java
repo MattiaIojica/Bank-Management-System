@@ -74,8 +74,7 @@ public class Main {
                     case 12 -> serviceMain.getUserTransactions(cin);
                     case 13 -> stop = true;
                 }
-                if (command >= 0 && command < 12) {
-                    if(command != 0)
+                if (command > 0 && command < commands.size()) {
                         serviceAudit.appendCommand(commands.get(command - 1));
                 }
 
