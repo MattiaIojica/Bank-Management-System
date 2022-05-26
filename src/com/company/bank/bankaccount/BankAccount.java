@@ -42,9 +42,16 @@ public class BankAccount {
     }
 
 
-    public void addCard(){
+    public Card addCard(){
         Card card = cardSingleton.addCard(this.IBAN);
         cardList.add(card);
+
+        return card;
+    }
+
+    public void addCard(Card card){
+        cardList.add(card);
+
     }
 
     //getters and setters

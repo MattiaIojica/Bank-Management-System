@@ -1,6 +1,8 @@
 package com.company.bank.card;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 
 public class Card {
@@ -29,6 +31,21 @@ public class Card {
         this.expirationDate = calendar.getTime();
     }
 
+    public Card(int id, ResultSet in) throws SQLException {
+        this.cvv = randomCvvGenerator();
+        this.cardId = id;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.YEAR, 4);
+        this.expirationDate = calendar.getTime();
+        this.readCard(in);
+    }
+
+    public void readCard(ResultSet in) throws SQLException {
+        this.number = in.getString("number");
+        this.IBAN = in.getString("IBAN");
+    }
+
     public void readCard(Scanner in){
         System.out.println("IBAN: ");
         this.IBAN = in.nextLine();
@@ -54,10 +71,15 @@ public class Card {
         return expirationDate;
     }
 
-    static private String randomNumberGenerator(){
-        byte[] number = new byte[16];
-        new Random().nextBytes(number);
-        return new String(number, StandardCharsets.UTF_8);
+    private String randomNumberGenerator(){
+        String str = "";
+        int min = 1;
+        int max = 9;
+        Random random = new Random();
+        for(int i = 0; i < 16; i++)
+            str += random.nextInt(max - min + 1) + min;
+
+        return str;
     }
 
     static private String randomPinGenerator(){
@@ -72,4 +94,14 @@ public class Card {
         return String.valueOf(random.nextInt(100) + 899);
     }
 
+    @Override
+    public String toString() {
+        return "Card{" +
+                "cardId=" + cardId +
+                ", cvv='" + cvv + '\'' +
+                ", number='" + number + '\'' +
+                ", IBAN='" + IBAN + '\'' +
+                ", expirationDate=" + expirationDate +
+                '}';
+    }
 }

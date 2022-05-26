@@ -38,7 +38,7 @@ public class TransactionDatabase {
         List<Transaction> transactions = new ArrayList<>();
         try{
             Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT * FROM Transactions");
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM Transactions order by dateT");
             while(resultSet.next()) {
                 Transaction transaction = new Transaction(resultSet);
                 transactions.add(transaction);

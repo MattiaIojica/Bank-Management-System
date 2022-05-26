@@ -2,6 +2,7 @@ package com.company;
 
 import com.company.audit.ServiceAudit;
 import com.company.databases.BankAccountDatabase;
+import com.company.databases.CardDatabase;
 import com.company.databases.TransactionDatabase;
 import com.company.databases.UserDatabase;
 
@@ -48,8 +49,9 @@ public class Main {
         BankAccountDatabase bankAccountDatabase = new BankAccountDatabase(connection);
         UserDatabase userDatabase = new UserDatabase(connection);
         TransactionDatabase transactionDatabase = new TransactionDatabase(connection);
+        CardDatabase cardDatabase = new CardDatabase(connection);
 
-        ServiceMain serviceMain = new ServiceMain(userDatabase, bankAccountDatabase, transactionDatabase);
+        ServiceMain serviceMain = new ServiceMain(userDatabase, bankAccountDatabase, transactionDatabase, cardDatabase);
         ServiceAudit serviceAudit = new ServiceAudit();
 
         boolean stop = false;

@@ -2,8 +2,10 @@ package com.company;
 
 import com.company.bank.bankaccount.BankAccount;
 import com.company.bank.bankaccount.BankAccountSingleton;
+import com.company.bank.card.Card;
 import com.company.bank.transactions.Transaction;
 import com.company.databases.BankAccountDatabase;
+import com.company.databases.CardDatabase;
 import com.company.databases.TransactionDatabase;
 import com.company.databases.UserDatabase;
 import com.company.user.User;
@@ -16,24 +18,35 @@ public class ServiceMain {
     private List<User> users = new ArrayList<>();
     private List<BankAccount> bankAccounts = new ArrayList<>();
     private List<Transaction> transactions = new ArrayList<>();
+    private List<Card> cards = new ArrayList<>();
     private final UserSingleton userSingleton = new UserSingleton();
     private final BankAccountSingleton bankAccountSingleton = new BankAccountSingleton();
     private UserDatabase userDatabase = null;
     private BankAccountDatabase bankAccountDatabase = null;
     private TransactionDatabase transactionDatabase = null;
+    private CardDatabase cardDatabase = null;
     private final Map<String, BankAccount> map = new HashMap<>();
 
     public ServiceMain(){
 
     }
 
-    public ServiceMain(UserDatabase userDatabase, BankAccountDatabase bankAccountDatabase, TransactionDatabase transactionDatabase){
+    public ServiceMain(UserDatabase userDatabase, BankAccountDatabase bankAccountDatabase, TransactionDatabase transactionDatabase, CardDatabase cardDatabase){
         this.userDatabase = userDatabase;
         this.bankAccountDatabase = bankAccountDatabase;
         this.transactionDatabase = transactionDatabase;
+        this.cardDatabase = cardDatabase;
         this.users = userDatabase.read();
         this.bankAccounts = bankAccountDatabase.read();
         this.transactions = transactionDatabase.read();
+        this.cards = cardDatabase.read();
+
+//        System.out.println(cards.toString());
+
+        for(BankAccount b : this.bankAccounts)
+            for (Card c : this.cards)
+                if(c.getIBAN().equals(b.getIBAN()))
+                    b.addCard(c);
 
         this.mapBankAccounts();
     }
@@ -226,10 +239,15 @@ public class ServiceMain {
         User user = this.getUserById(cin);
         BankAccount bankAccount = this.getBankAccountFromInput(cin, user);
 
-        bankAccount.addCard();
+        Card card = bankAccount.addCard();
+
+        if(this.cardDatabase != null)
+            this.cardDatabase.create(card);
     }
 
     public void getUserTransactions(Scanner cin) throws Exception{
+
+//        System.out.println(transactions.toString());
         User user = this.getUserById(cin);
         List<BankAccount> userBankAccounts = getUserBankAccounts(user);
 
