@@ -1,141 +1,94 @@
 package com.company;
 
-import com.company.DataBase;
-import com.company.bank.bankaccount.BankAccount;
-import com.company.bank.bankaccount.ServiceBankAccount;
-import com.company.bank.card.Card;
-import com.company.bank.card.ServiceCard;
-import com.company.user.ServiceUser;
-import com.company.user.User;
+import com.company.audit.ServiceAudit;
+import com.company.databases.BankAccountDatabase;
+import com.company.databases.CardDatabase;
+import com.company.databases.TransactionDatabase;
+import com.company.databases.UserDatabase;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.util.*;
 
 public class Main {
 
+    static List<String> commands = Arrays.asList("Create new user", "Print user", "Delete user", "Create Bank account",
+            "Close Bank Account", "Create card", "Print User's Bank Accounts", "Create Transaction", "Deposit Money",
+            "Withdraw Money", "Check Balance", "Print User Transactions", "Stop!");
+
+
+    public static Connection getConnection() {
+        try{
+            String url = "jdbc:mysql://localhost:3306/projectpao";
+            String user = "root";
+            String password = "pao2022rootQ";
+
+            return DriverManager.getConnection(url, user, password);
+        }catch (SQLException e){
+            System.out.println(e.toString());
+            return null;
+        }
+    }
+
+    private static void printAllCommands(){
+
+            System.out.println("Commands:");
+        for(int i = 0; i < commands.size(); i++)
+            System.out.println((i+1) + ". " + commands.get(i));
+    }
+
     public static void main(String[] args) {
+        printAllCommands();
 
-//        User u = new User("mattia", "iojica", "1", "sasaa@gmmail", "2041294101", "m");
-//        BankAccount b = new BankAccount();
-//        ServiceBankAccount serviceBankAccount = new ServiceBankAccount();
-//        serviceBankAccount.addBankAccount(b);
-//
-//        serviceBankAccount.showAccount(b);
-//        serviceBankAccount.deposit(b, 500);
-//        serviceBankAccount.showAccount(b);
-//
-//
-//        serviceBankAccount.showTransactions(b);
+        Scanner cin = new Scanner(System.in);
 
-//        DataBase dataBase = DataBase.getInstance();
-//
-//        dataBase.loadDataFromFile();
-        ServiceUser serviceUser = ServiceUser.getInstance();
-        serviceUser = readUsersFromFile();
+        Connection connection = Main.getConnection();
+        BankAccountDatabase bankAccountDatabase = new BankAccountDatabase(connection);
+        UserDatabase userDatabase = new UserDatabase(connection);
+        TransactionDatabase transactionDatabase = new TransactionDatabase(connection);
+        CardDatabase cardDatabase = new CardDatabase(connection);
 
-        ServiceCard serviceCard = ServiceCard.getInstance();
-        serviceCard = readCardsFromFile();
+        ServiceMain serviceMain = new ServiceMain(userDatabase, bankAccountDatabase, transactionDatabase, cardDatabase);
+        ServiceAudit serviceAudit = new ServiceAudit();
 
-        ServiceBankAccount serviceBankAccount = ServiceBankAccount.getInstance();
-        serviceBankAccount = readBankAccountsFromFile(serviceUser, serviceCard);
+        boolean stop = false;
+        while (stop != true) {
+            System.out.println("Insert Command: (0 to print the command list)");
+            int command = Integer.parseInt(cin.nextLine());
 
-//        for(int i = 0; i < serviceUser.getUsers().size(); i++){
-//            System.out.println(serviceCard.getCards().get(i).getNumber());
-//        }
-//
-//        for(int i = 0; i < serviceBankAccount.getBankAccounts().size(); i++){
-//            serviceBankAccount.getBankAccounts().get(i).showAccount();
-//        }
+            try {
+                switch (command) {
+                    case 0 -> printAllCommands();
+                    case 1 -> serviceMain.createUser(cin);
+                    case 2 -> serviceMain.printUser(cin);
+                    case 3 -> serviceMain.deleteUser(cin);
+                    case 4 -> serviceMain.createBankAccount(cin);
+                    case 5 -> serviceMain.closeBankAccount(cin);
+                    case 6 -> serviceMain.createCard(cin);
+                    case 7 -> serviceMain.getUserBankAccounts(cin);
+                    case 8 -> serviceMain.createTransaction(cin);
+                    case 9 -> serviceMain.depositMoney(cin);
+                    case 10 -> serviceMain.withdrawMoney(cin);
+                    case 11 -> serviceMain.checkBalance(cin);
+                    case 12 -> serviceMain.getUserTransactions(cin);
+                    case 13 -> stop = true;
+                }
+                if (command > 0 && command < commands.size()) {
+                        serviceAudit.appendCommand(commands.get(command - 1));
+                }
 
-
-        for(int i = 0; i < serviceUser.getUsers().size(); i++){
-            serviceUser.addBankAccountToUser(serviceUser.getUsers().get(i), serviceBankAccount.getBankAccounts().get(i));
-        }
-
-//        for(int i = 0; i < serviceBankAccount.getBankAccounts().size(); i++){
-//            System.out.println(serviceBankAccount.getBankAccounts().get(i).getCardList().size());
-//        }
-
-        for(int i = 0; i < serviceUser.getUsers().size(); i++){
-            System.out.println(serviceUser.getUsers().get(i).getBankAccounts().get(0).getCardList().get(0).getNumber());
-        }
-    }
-
-    private static ServiceUser readUsersFromFile() {
-
-        ServiceUser serviceUser = ServiceUser.getInstance();
-        try {
-            BufferedReader in = new BufferedReader(new FileReader("userData.csv"));
-            String str;
-            Double balance;
-
-            while ((str = in.readLine()) != null) {
-                String[] ar = str.split(",");
-                User u = new User(ar[0], ar[1], ar[2], ar[3], ar[4], ar[5]);
-                serviceUser.addUser(u);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            in.close();
-        } catch (
-                IOException e) {
-            System.out.println("File Read Error");
         }
 
-        return serviceUser;
     }
 
-    private static ServiceBankAccount readBankAccountsFromFile(ServiceUser serviceUser, ServiceCard serviceCard) {
-
-        int i = 0;
-        ServiceBankAccount serviceBankAccount = new ServiceBankAccount().getInstance();
-        try {
-            BufferedReader in = new BufferedReader(new FileReader("bankData.csv"));
-            String str;
-
-            while ((str = in.readLine()) != null) {
-                List<Card>cards = new ArrayList<>();
-                cards.add(serviceCard.getCards().get(i));
-                double amount = Double.parseDouble(str);
-//                System.out.println(Arrays.toString(ar));
-                BankAccount bankAccount = new BankAccount(amount, serviceUser.getUsers().get(i), (ArrayList<Card>) cards);
-//                serviceBankAccount.addCardToBankAccount(bankAccount, serviceCard.getCards().get(i));
-                serviceBankAccount.addBankAccount(bankAccount);
-//                System.out.println(serviceBankAccount.getBankAccounts().get(i).getCardList().size());
-                i++;
-            }
-            in.close();
-        } catch (
-                IOException e) {
-            System.out.println("File Read Error");
-        }
-
-        return serviceBankAccount;
-    }
-
-    private static ServiceCard readCardsFromFile() {
-
-        ServiceCard serviceCard = ServiceCard.getInstance();
-
-        try {
-            BufferedReader in = new BufferedReader(new FileReader("cardData.csv"));
-            String str;
-
-            while ((str = in.readLine()) != null) {
-                String[] ar = str.split(",");
-//                System.out.println(Arrays.toString(ar));
-                Card card = new Card(ar[0], ar[1], ar[2]);
-                serviceCard.addCard(card);
-            }
-            in.close();
-        } catch (
-                IOException e) {
-            System.out.println("File Read Error");
-        }
-
-        return serviceCard;
-    }
 }

@@ -1,60 +1,86 @@
 package com.company.user;
 
 import com.company.bank.bankaccount.BankAccount;
+import com.company.bank.bankaccount.BankAccountSingleton;
+import com.company.bank.bankaccount.ServiceBankAccount;
 
+import java.io.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 public class ServiceUser {
 
     private List<User> users = new ArrayList<>();
     private static ServiceUser instance;
 
-    private ServiceUser(){
-    }
 
     public static ServiceUser getInstance() {
-        if(instance == null)
+        if (instance == null)
             instance = new ServiceUser();
         return instance;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public void setUser(List<User> users){
+        this.users = users;
     }
 
-    public User getUserById(String id){
+    private static List<String[]> getDataFromFile(String fileName){
 
-        for (int i = 0; i < this.users.size(); i++)
-            if (this.users.get(i).getId().equals(id))
-                return this.users.get(i);
+        List<String[]> str = new ArrayList<>();
 
-        return null;
+        try(BufferedReader in = new BufferedReader(new FileReader(fileName))) {
+
+            String l;
+            while((l = in.readLine()) != null ) {
+                String[] ar = l.replaceAll(" ", "").split(",");
+                str.add(ar);
+            }
+        } catch (IOException e) {
+            System.out.println("No users found!");
+        }
+
+        return str;
     }
 
-    public boolean checkEmail(String email){
+    public void loadFromFile(){
 
-        for (int i = 0; i < this.users.size(); i++)
-            if (this.users.get(i).getEmail().equals(email))
-                return true;
+        try {
+            List<String[]> str = ServiceUser.getDataFromFile("data/users.csv");
 
-        return false;
+            for (String[] ar : str) {
+                User user = new User(
+                        Integer.parseInt(ar[0]),
+                        ar[1],
+                        ar[2],
+                        ar[3],
+                        ar[4],
+                        ar[5],
+                        new SimpleDateFormat("yyyy-MM-dd").parse(ar[6]),
+                        ar[7]
+                );
+                users.add(user);
+            }
+            UserSingleton.incrementId(str.size());
+        }catch (ParseException e){
+            System.out.println(e.toString());
+        }
     }
 
-    public void addUser(User user){
-        this.users.add(user);
+    public void uploadToFile(){
+        try {
+            Writer writer = new FileWriter("data/users.csv");
+            for(User user : this.users){
+                writer.write(user.toFile());
+                writer.write('\n');
+            }
+            writer.close();
+        }catch (IOException e){
+            System.out.println(e.toString());
+        }
     }
-
-    public void removeUser(User user){
-        this.users.removeIf(x -> x.getId() == user.getId());
-    }
-
-    public void addBankAccountToUser(User user, BankAccount bankAccount){
-        List <BankAccount> bankAccounts = new ArrayList<>();
-        bankAccounts.addAll(user.getBankAccounts());
-        bankAccounts.add(bankAccount);
-        user.setBankAccounts(bankAccounts);
-    }
-
-
 }

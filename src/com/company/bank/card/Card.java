@@ -1,62 +1,85 @@
 package com.company.bank.card;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Random;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.*;
 
 public class Card {
-    protected String number;
-    protected String pin;
-    protected String cvv;
+    private final int cardId;
+    private final String cvv;
+    private String number;
+    private String IBAN;
+    private final Date expirationDate;
 
-    public Card(){
+    static private final Set<String> usedNumbers = new HashSet<>();
+
+    public Card(int cardId, String IBAN) {
+        this.cardId = cardId;
+        this.IBAN = IBAN;
         this.number = randomNumberGenerator();
-        this.pin = randomPinGenerator();
         this.cvv = randomCvvGenerator();
+
+        //check if the number is already used
+        while(usedNumbers.contains(this.number))
+            this.number = randomNumberGenerator();
+        usedNumbers.add(this.number);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.YEAR, 4);
+        this.expirationDate = calendar.getTime();
     }
 
-    public Card(String pin){
-        this.number = randomNumberGenerator();
-        this.pin = pin;
+    public Card(int id, ResultSet in) throws SQLException {
         this.cvv = randomCvvGenerator();
+        this.cardId = id;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.YEAR, 4);
+        this.expirationDate = calendar.getTime();
+        this.readCard(in);
     }
 
-    public Card(String number, String pin, String cvv){
-        this.number = number;
-        this.pin = pin;
-        this.cvv = cvv;
+    public void readCard(ResultSet in) throws SQLException {
+        this.number = in.getString("number");
+        this.IBAN = in.getString("IBAN");
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void readCard(Scanner in){
+        System.out.println("IBAN: ");
+        this.IBAN = in.nextLine();
     }
 
-    public void setPin(String pin) {
-        this.pin = pin;
-    }
-
-    public void setCvv(String cvv) {
-        this.cvv = cvv;
-    }
-
-
-    public String getNumber() {
-        return number;
-    }
-
-    public String getPin() {
-        return pin;
+    public int getCardId() {
+        return cardId;
     }
 
     public String getCvv() {
         return cvv;
     }
 
-    static private String randomNumberGenerator(){
-        byte[] number = new byte[16];
-        new Random().nextBytes(number);
-        return new String(number, StandardCharsets.UTF_8);
+    public String getNumber() {
+        return number;
+    }
+
+    public String getIBAN() {
+        return IBAN;
+    }
+
+    public Date getExpirationDate() {
+        return expirationDate;
+    }
+
+    private String randomNumberGenerator(){
+        String str = "";
+        int min = 1;
+        int max = 9;
+        Random random = new Random();
+        for(int i = 0; i < 16; i++)
+            str += random.nextInt(max - min + 1) + min;
+
+        return str;
     }
 
     static private String randomPinGenerator(){
@@ -72,15 +95,13 @@ public class Card {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Card card = (Card) o;
-        return Objects.equals(number, card.number) && Objects.equals(pin, card.pin) && Objects.equals(cvv, card.cvv);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(number, pin);
+    public String toString() {
+        return "Card{" +
+                "cardId=" + cardId +
+                ", cvv='" + cvv + '\'' +
+                ", number='" + number + '\'' +
+                ", IBAN='" + IBAN + '\'' +
+                ", expirationDate=" + expirationDate +
+                '}';
     }
 }
