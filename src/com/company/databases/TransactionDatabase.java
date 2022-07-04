@@ -98,12 +98,13 @@ public class TransactionDatabase {
     }
 
     public void delete(Transaction transaction){
+        String deleteSQL = "DELETE FROM Transactions WHERE fromIBAN = ?, toIBAN = ?, dateT = ?";
         try{
             java.util.Date d = (java.util.Date) transaction.getDate();
             java.sql.Date sqlDate = new java.sql.Date(d.getTime());
             java.sql.Timestamp sqlTime = new java.sql.Timestamp(d.getTime());
-            String query = "DELETE FROM Transactions WHERE fromIBAN = ?, toIBAN = ?, dateT = ?";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
+
+            PreparedStatement prepareStatement = connection.prepareStatement(deleteSQL);
             prepareStatement.setString(1, transaction.getFrom());
             prepareStatement.setString(2, transaction.getTo());
             prepareStatement.setTimestamp(4, sqlTime);

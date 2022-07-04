@@ -107,7 +107,7 @@ public class UserDatabase {
 
 
     public void delete(User user){
-            String deleteSQL = "DELETE FROM Users WHERE id = ?";
+        String deleteSQL = "DELETE FROM Users WHERE id = ?";
         try{
             PreparedStatement prepareStatement = connection.prepareStatement(deleteSQL);
             prepareStatement.setInt(1, user.getId());

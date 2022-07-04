@@ -56,10 +56,10 @@ public class BankAccountDatabase {
 
     public List<BankAccount> read(){
         List<BankAccount> bankAccounts = new ArrayList<>();
-
+        String readSQL = "SELECT * FROM BankAccounts";
         try{
             Statement statement = connection.createStatement();
-            ResultSet result = statement.executeQuery("SELECT * FROM BankAccounts");
+            ResultSet result = statement.executeQuery(readSQL);
             while(result.next()) {
                 BankAccount bankAccount = new BankAccount(result);
                 bankAccounts.add(bankAccount);
@@ -72,9 +72,9 @@ public class BankAccountDatabase {
     }
 
     public void update(BankAccount bankAccount){
+        String updateSQL = "UPDATE BankAccounts SET balance = ?, ownerId = ? WHERE IBAN = ?";
         try{
-            String query = "UPDATE BankAccounts SET balance = ?, ownerId = ? WHERE IBAN = ?";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            PreparedStatement prepareStatement = connection.prepareStatement(updateSQL);
             prepareStatement.setDouble(1, bankAccount.getBalance());
             prepareStatement.setInt(2, bankAccount.getOwnerId());
             prepareStatement.setString(3, bankAccount.getIBAN());
@@ -87,9 +87,9 @@ public class BankAccountDatabase {
 
 
     public void delete(BankAccount bankAccount){
+        String deleteSQL = "DELETE FROM BankAccounts WHERE IBAN = ?";
         try{
-            String query = "DELETE FROM BankAccounts WHERE IBAN = ?";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            PreparedStatement prepareStatement = connection.prepareStatement(deleteSQL);
             prepareStatement.setString(1, bankAccount.getIBAN());
             prepareStatement.execute();
             prepareStatement.close();

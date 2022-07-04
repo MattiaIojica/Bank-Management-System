@@ -86,9 +86,9 @@ public class CardDatabase {
 
 
     public void delete(Card card){
+        String deleteSQL = "DELETE FROM Cards WHERE cardId = ?";
         try{
-            String query = "DELETE FROM Cards WHERE cardId = ?";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            PreparedStatement prepareStatement = connection.prepareStatement(deleteSQL);
             prepareStatement.setString(1, card.getNumber());
             prepareStatement.execute();
             prepareStatement.close();
