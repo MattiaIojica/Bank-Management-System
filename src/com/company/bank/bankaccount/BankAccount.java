@@ -2,8 +2,6 @@ package com.company.bank.bankaccount;
 
 import com.company.bank.card.Card;
 import com.company.bank.card.CardSingleton;
-import com.company.bank.transactions.Transaction;
-import com.company.user.*;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,7 +13,7 @@ public class BankAccount {
     protected int ownerId;
 
     protected List<Card> cardList = new ArrayList<>();
-    private final CardSingleton cardSingleton = new CardSingleton();
+    private final CardSingleton cardSingleton = CardSingleton.getInstance();
     static private final Set<String> usedNumbers = new HashSet<>();
 
     public BankAccount(String IBAN, double balance, int ownerId){
@@ -51,7 +49,6 @@ public class BankAccount {
 
     public void addCard(Card card){
         cardList.add(card);
-
     }
 
     //getters and setters

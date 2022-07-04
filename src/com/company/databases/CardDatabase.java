@@ -2,29 +2,54 @@ package com.company.databases;
 
 import com.company.bank.card.Card;
 import com.company.bank.card.CardSingleton;
+import com.company.config.DatabaseConfig;
 
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class CardDatabase {
-    Connection connection;
 
-    CardSingleton cardSingleton = new CardSingleton();
+    private static CardDatabase instance;
+    private static CardSingleton cardSingleton = CardSingleton.getInstance();
+    private static Connection connection = DatabaseConfig.getDatabaseConnection();
 
-    public CardDatabase(Connection connection) {
-        this.connection = connection;
+
+    private CardDatabase(){
+        create();
     }
 
-    public void create(Card card){
+    public static CardDatabase getInstance() {
+        if(instance == null){
+            instance = new CardDatabase();
+        }
+        return instance;
+    }
+
+    public void create(){
+
+        String createSQL = "CREATE TABLE IF NOT EXISTS Cards " +
+                "(cardId int NOT NULL,"+
+                "cvv varchar(5) DEFAULT NULL,"+
+                "number varchar(25) DEFAULT NULL,"+
+                "IBAN varchar(25) DEFAULT NULL,"+
+                "expirationDate date DEFAULT NULL,"+
+                "PRIMARY KEY (cardId))";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(createSQL);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insert(Card card){
+        String insertSQL = "INSERT INTO Cards (cardId, cvv, number, IBAN, expirationDate) VALUES (?, ?, ?, ?, ?)";
+
         try{
-            String query = "INSERT INTO Cards (cardId, cvv, number, IBAN, expirationDate) VALUES (?, ?, ?, ?, ?)";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            PreparedStatement prepareStatement = connection.prepareStatement(insertSQL);
             prepareStatement.setInt(1, card.getCardId());
             prepareStatement.setString(2, card.getCvv());
             prepareStatement.setString(3, card.getNumber());
@@ -38,19 +63,22 @@ public class CardDatabase {
     }
 
     public List<Card> read(){
+        String readSQL = "SELECT * FROM Cards";
         List<Card> cards = new ArrayList<>();
+//        BankAccountDatabase bankAccountDatabase = BankAccountDatabase.getInstance();
         try{
             Statement statement = connection.createStatement();
-            ResultSet result = statement.executeQuery("SELECT * FROM Cards");
+            ResultSet result = statement.executeQuery(readSQL);
             while(result.next()) {
-//                System.out.println(result);
                 Card card = cardSingleton.createCard(result);
                 cards.add(card);
+
             }
             statement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }
+
         return cards;
     }
 

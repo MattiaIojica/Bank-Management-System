@@ -1,14 +1,9 @@
 package com.company.bank.bankaccount;
 
 
-import com.company.bank.card.Card;
-import com.company.bank.transactions.Transaction;
-import com.company.user.User;
-
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class ServiceBankAccount {
 

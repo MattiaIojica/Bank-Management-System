@@ -5,6 +5,24 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 
 public class ServiceAudit {
+
+    private static ServiceAudit instance;
+
+    public ServiceAudit() {
+        try{
+            this.fileWriter = new FileWriter("data/audit.csv");
+        }catch (IOException e){
+            System.out.println(e.toString());
+        }
+    }
+
+    public static ServiceAudit getInstance(){
+        if(instance == null){
+            instance = new ServiceAudit();
+        }
+        return instance;
+    }
+
     FileWriter fileWriter;
 
     private final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -15,13 +33,5 @@ public class ServiceAudit {
         fileWriter.append(dateTimeFormatter.format(LocalDateTime.now()));
         fileWriter.append('\n');
         fileWriter.flush();
-    }
-
-    public ServiceAudit() {
-        try{
-            this.fileWriter = new FileWriter("data/audit.csv");
-        }catch (IOException e){
-            System.out.println(e.toString());
-        }
     }
 }

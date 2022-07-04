@@ -1,21 +1,49 @@
 package com.company.databases;
 
 import com.company.bank.bankaccount.BankAccount;
+import com.company.config.DatabaseConfig;
 
 import java.util.*;
 import java.sql.*;
 
 public class BankAccountDatabase {
-    Connection connection;
 
-    public BankAccountDatabase(Connection connection){
-        this.connection = connection;
+    private static Connection connection = DatabaseConfig.getDatabaseConnection();
+
+    private static BankAccountDatabase instance;
+
+    private BankAccountDatabase(){
+        create();
     }
 
-    public void create(BankAccount bankAccount){
+    public static BankAccountDatabase getInstance(){
+        if(instance == null){
+            instance = new BankAccountDatabase();
+        }
+        return instance;
+    }
+
+    public void create(){
+
+        String createSQL = "CREATE TABLE IF NOT EXISTS Bankaccounts " +
+                "(IBAN varchar(20) NOT NULL," +
+                "balance double(10,2) DEFAULT NULL," +
+                "ownerId int DEFAULT NULL," +
+                " PRIMARY KEY (IBAN)" +
+                ")";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(createSQL);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insert(BankAccount bankAccount){
+        String insertSQL = "INSERT INTO BankAccounts (IBAN, balance, ownerId) VALUES (?, ?, ?)";
+
         try{
-            String query = "INSERT INTO BankAccounts (IBAN, balance, ownerId) VALUES (?, ?, ?)";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            PreparedStatement prepareStatement = connection.prepareStatement(insertSQL);
             prepareStatement.setString(1, bankAccount.getIBAN());
             prepareStatement.setDouble(2, bankAccount.getBalance());
             prepareStatement.setInt(3, bankAccount.getOwnerId());

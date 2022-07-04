@@ -1,25 +1,58 @@
 package com.company.databases;
 
-import com.company.user.User;
-import com.company.user.UserSingleton;
+import com.company.config.DatabaseConfig;
+import com.company.person.user.User;
+import com.company.person.user.UserSingleton;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class UserDatabase {
-    Connection connection;
 
-    UserSingleton userSingleton = new UserSingleton();
+    private static UserDatabase instance;
+    private UserSingleton userSingleton = UserSingleton.getInstance();
+    private Connection connection = DatabaseConfig.getDatabaseConnection();
 
-    public UserDatabase(Connection connection) {
-        this.connection = connection;
+
+    private UserDatabase(){
+        create();
     }
 
-    public void create(User user){
+    public static UserDatabase getInstance() {
+        if(instance == null){
+            instance = new UserDatabase();
+        }
+        return instance;
+    }
+
+    public void create(){
+
+        String createSQL = "CREATE TABLE IF NOT EXISTS Users " +
+                "(id int NOT NULL,"+
+                "firstName varchar(45) NOT NULL,"+
+                "lastName varchar(45) NOT NULL,"+
+                "CNP varchar(20) NOT NULL,"+
+                "email varchar(45) DEFAULT NULL,"+
+                "phoneNo varchar(20) DEFAULT NULL,"+
+                "birthDate date DEFAULT NULL,"+
+                "sex varchar(5) DEFAULT NULL,"+
+                "PRIMARY KEY (id),"+
+                "UNIQUE KEY CNP_UNIQUE (CNP))";
+
+        try (Statement stmt = connection.createStatement()) {
+            stmt.execute(createSQL);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void insert(User user){
+
+        String insertSQL = "INSERT INTO Users (id, firstName, lastName, CNP, email, phoneNo, birthDate, sex) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+
         try{
-            String query = "INSERT INTO Users (id, firstName, lastName, CNP, email, phoneNo, birthDate, sex) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            PreparedStatement prepareStatement = connection.prepareStatement(insertSQL);
             prepareStatement.setInt(1, user.getId());
             prepareStatement.setString(2, user.getFirstName());
             prepareStatement.setString(3, user.getLastName());
@@ -36,10 +69,11 @@ public class UserDatabase {
     }
 
     public List<User> read(){
+        String selectSQL = "SELECT * FROM Users";
         List<User> users = new ArrayList<>();
         try{
             Statement statement = connection.createStatement();
-            ResultSet result = statement.executeQuery("SELECT * FROM Users");
+            ResultSet result = statement.executeQuery(selectSQL);
             while(result.next()) {
                 User user = userSingleton.createUser(result);
                 users.add(user);
@@ -52,9 +86,10 @@ public class UserDatabase {
     }
 
     public void update(User user){
+        String updateSQL = "UPDATE Users SET firstName = ?, lastName = ?, CNP = ?, email = ?, phoneNo = ?, birthDate = ?, sex = ? WHERE id = ?";
         try{
-            String query = "UPDATE Users SET firstName = ?, lastName = ?, CNP = ?, email = ?, phoneNo = ?, birthDate = ?, sex = ? WHERE id = ?";
-            PreparedStatement preparedStmt = connection.prepareStatement(query);
+
+            PreparedStatement preparedStmt = connection.prepareStatement(updateSQL);
             preparedStmt.setString(1, user.getFirstName());
             preparedStmt.setString(2, user.getLastName());
             preparedStmt.setString(3, user.getCNP());
@@ -72,9 +107,9 @@ public class UserDatabase {
 
 
     public void delete(User user){
+            String deleteSQL = "DELETE FROM Users WHERE id = ?";
         try{
-            String query = "DELETE FROM Users WHERE id = ?";
-            PreparedStatement prepareStatement = connection.prepareStatement(query);
+            PreparedStatement prepareStatement = connection.prepareStatement(deleteSQL);
             prepareStatement.setInt(1, user.getId());
             prepareStatement.execute();
             prepareStatement.close();
