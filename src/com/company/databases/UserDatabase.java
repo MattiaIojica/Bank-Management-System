@@ -2,7 +2,7 @@ package com.company.databases;
 
 import com.company.config.DatabaseConfig;
 import com.company.person.user.User;
-import com.company.person.user.UserSingleton;
+import com.company.person.user.UserFactory;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
@@ -11,8 +11,8 @@ import java.util.*;
 public class UserDatabase {
 
     private static UserDatabase instance;
-    private UserSingleton userSingleton = UserSingleton.getInstance();
-    private Connection connection = DatabaseConfig.getDatabaseConnection();
+    private final UserFactory userFactory = UserFactory.getInstance();
+    private final Connection connection = DatabaseConfig.getDatabaseConnection();
 
 
     private UserDatabase(){
@@ -25,6 +25,35 @@ public class UserDatabase {
         }
         return instance;
     }
+
+    public User getUserById(int id) {
+        String selectSql = "SELECT * FROM user WHERE id=?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+            preparedStatement.setInt(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return mapToUser(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public User getUserByCNP(int cnp) {
+        String selectSql = "SELECT * FROM user WHERE cnp=?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+            preparedStatement.setInt(4, cnp);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return mapToUser(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
     public void create(){
 
@@ -64,7 +93,7 @@ public class UserDatabase {
             prepareStatement.execute();
             prepareStatement.close();
         }catch (Exception e){
-            System.out.println(e.toString());
+            System.out.println(e);
         }
     }
 
@@ -75,12 +104,12 @@ public class UserDatabase {
             Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery(selectSQL);
             while(result.next()) {
-                User user = userSingleton.createUser(result);
+                User user = userFactory.createUser(result);
                 users.add(user);
             }
             statement.close();
         }catch (Exception e){
-            System.out.println(e.toString());
+            System.out.println(e);
         }
         return users;
     }
@@ -101,7 +130,7 @@ public class UserDatabase {
             preparedStmt.executeUpdate();
             preparedStmt.close();
         }catch (Exception e){
-            System.out.println(e.toString());
+            System.out.println(e);
         }
     }
 
@@ -114,7 +143,14 @@ public class UserDatabase {
             prepareStatement.execute();
             prepareStatement.close();
         }catch (Exception e){
-            System.out.println(e.toString());
+            System.out.println(e);
         }
+    }
+
+    private User mapToUser(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            return new User(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4),resultSet.getString(5),resultSet.getString(6),resultSet.getDate(7),resultSet.getString(8));
+        }
+        return null;
     }
 }

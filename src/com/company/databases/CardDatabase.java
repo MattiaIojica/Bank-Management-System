@@ -1,8 +1,10 @@
 package com.company.databases;
 
+import com.company.bank.bankaccount.BankAccount;
 import com.company.bank.card.Card;
-import com.company.bank.card.CardSingleton;
+import com.company.bank.card.CardFactory;
 import com.company.config.DatabaseConfig;
+import com.company.person.Person;
 
 
 import java.sql.*;
@@ -13,7 +15,7 @@ import java.util.List;
 public class CardDatabase {
 
     private static CardDatabase instance;
-    private static CardSingleton cardSingleton = CardSingleton.getInstance();
+    private static CardFactory cardFactory = CardFactory.getInstance();
     private static Connection connection = DatabaseConfig.getDatabaseConnection();
 
 
@@ -45,18 +47,30 @@ public class CardDatabase {
         }
     }
 
+    public Card getCardByCardId(int id) {
+        String selectSql = "SELECT * FROM Cards WHERE cardId=?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+            preparedStatement.setInt(1, id);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return mapToCard(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public void insert(Card card){
         String insertSQL = "INSERT INTO Cards (cardId, cvv, number, IBAN, expirationDate) VALUES (?, ?, ?, ?, ?)";
 
-        try{
-            PreparedStatement prepareStatement = connection.prepareStatement(insertSQL);
+        try(PreparedStatement prepareStatement = connection.prepareStatement(insertSQL)){
             prepareStatement.setInt(1, card.getCardId());
             prepareStatement.setString(2, card.getCvv());
             prepareStatement.setString(3, card.getNumber());
             prepareStatement.setString(4, card.getIBAN());
             prepareStatement.setString(5, (new SimpleDateFormat("yyyy-MM-dd")).format(card.getExpirationDate()));
             prepareStatement.execute();
-            prepareStatement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }
@@ -70,7 +84,7 @@ public class CardDatabase {
             Statement statement = connection.createStatement();
             ResultSet result = statement.executeQuery(readSQL);
             while(result.next()) {
-                Card card = cardSingleton.createCard(result);
+                Card card = cardFactory.createCard(result);
                 cards.add(card);
 
             }
@@ -87,13 +101,18 @@ public class CardDatabase {
 
     public void delete(Card card){
         String deleteSQL = "DELETE FROM Cards WHERE cardId = ?";
-        try{
-            PreparedStatement prepareStatement = connection.prepareStatement(deleteSQL);
+        try(PreparedStatement prepareStatement = connection.prepareStatement(deleteSQL)){
             prepareStatement.setString(1, card.getNumber());
             prepareStatement.execute();
-            prepareStatement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }
+    }
+
+    private Card mapToCard(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            return new Card(resultSet.getInt(1), resultSet.getString(2), resultSet.getString(3), resultSet.getString(4), resultSet.getDate(5));
+        }
+        return null;
     }
 }

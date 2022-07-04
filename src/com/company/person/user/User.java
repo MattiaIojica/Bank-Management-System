@@ -138,7 +138,7 @@ public class User extends Person {
 
     @Override
     public String toFile() {
-        return super.toFile();
+        return id + "," + super.toFile();
     }
 
     @Override

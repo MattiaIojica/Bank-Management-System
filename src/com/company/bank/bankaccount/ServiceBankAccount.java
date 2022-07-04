@@ -8,12 +8,12 @@ import java.util.List;
 public class ServiceBankAccount {
 
     private List<BankAccount> bankAccounts = new ArrayList<>();
-    private static BankAccountSingleton instance;
+    private static BankAccountFactory instance;
 
 
-    public static BankAccountSingleton getInstance() {
+    public static BankAccountFactory getInstance() {
         if (instance == null)
-            instance = new BankAccountSingleton();
+            instance = new BankAccountFactory();
         return instance;
     }
 

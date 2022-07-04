@@ -1,7 +1,7 @@
 package com.company;
 
 import com.company.bank.bankaccount.BankAccount;
-import com.company.bank.bankaccount.BankAccountSingleton;
+import com.company.bank.bankaccount.BankAccountFactory;
 import com.company.bank.card.Card;
 import com.company.bank.transactions.Transaction;
 import com.company.databases.BankAccountDatabase;
@@ -9,7 +9,7 @@ import com.company.databases.CardDatabase;
 import com.company.databases.TransactionDatabase;
 import com.company.databases.UserDatabase;
 import com.company.person.user.User;
-import com.company.person.user.UserSingleton;
+import com.company.person.user.UserFactory;
 import java.text.ParseException;
 import java.util.*;
 
@@ -17,13 +17,13 @@ public class ServiceMain {
 
     private static ServiceMain instance;
 
-    private List<User> users = new ArrayList<>();
-    private List<BankAccount> bankAccounts = new ArrayList<>();
-    private List<Transaction> transactions = new ArrayList<>();
-    private List<Card> cards = new ArrayList<>();
+    private final List<User> users;
+    private final List<BankAccount> bankAccounts;
+    private final List<Transaction> transactions;
+    private final List<Card> cards;
 
-    private final UserSingleton userSingleton = UserSingleton.getInstance();
-    private final BankAccountSingleton bankAccountSingleton = BankAccountSingleton.getInstance();
+    private final UserFactory userFactory = UserFactory.getInstance();
+    private final BankAccountFactory bankAccountFactory = BankAccountFactory.getInstance();
     private final Map<String, BankAccount> map = new HashMap<>();
 
     private final UserDatabase userDatabase = UserDatabase.getInstance();
@@ -72,7 +72,7 @@ public class ServiceMain {
     }
 
     private List<BankAccount> getUserBankAccounts(User user){
-        List<BankAccount> userBankAccounts = new ArrayList<BankAccount>();
+        List<BankAccount> userBankAccounts = new ArrayList<>();
 
         for(BankAccount b : bankAccounts)
             if(b.getOwnerId() == user.getId())
@@ -113,7 +113,7 @@ public class ServiceMain {
     }
 
     public void createUser(Scanner cin) throws ParseException{
-        User user = userSingleton.createUser(cin);
+        User user = userFactory.createUser(cin);
         this.users.add(user);
 
         if(this.userDatabase != null)
@@ -128,7 +128,7 @@ public class ServiceMain {
 
     public void createBankAccount(Scanner cin) throws Exception{
          User user = this.getUserById(cin);
-         BankAccount bankAccount = this.bankAccountSingleton.createAccount(user.getId());
+         BankAccount bankAccount = this.bankAccountFactory.createAccount(user.getId());
          bankAccounts.add(bankAccount);
          map.put(bankAccount.getIBAN(), bankAccount);
 
@@ -176,7 +176,7 @@ public class ServiceMain {
         User user = getUserById(cin);
         List<BankAccount> userBankAccounts = getUserBankAccounts(user);
 
-        System.out.println(userBankAccounts.toString());
+        System.out.println(userBankAccounts);
     }
 
     public void createTransaction(Scanner cin) throws Exception{
@@ -246,7 +246,7 @@ public class ServiceMain {
         for(Transaction t : transactions)
             for(BankAccount b : userBankAccounts){
                 if(t.getFrom().equals(b.getIBAN()))
-                    System.out.println(t.toString());
+                    System.out.println(t);
             }
     }
 
@@ -262,7 +262,7 @@ public class ServiceMain {
         if(userBankAccounts.size() == 1)
         {
             userBankAccounts.get(0).setBalance(userBankAccounts.get(0).getBalance() + amount);
-            IBAN = userBankAccounts.get(0).getIBAN();
+//            IBAN = userBankAccounts.get(0).getIBAN();
             if(this.bankAccountDatabase!=null){
                 this.bankAccountDatabase.update(userBankAccounts.get(0));
             }
@@ -273,7 +273,7 @@ public class ServiceMain {
             boolean ok = false;
             int idx = -1;
             for(BankAccount b : userBankAccounts){
-                if(IBAN == b.getIBAN())
+                if(IBAN.equals(b.getIBAN()))
                 {
                     ok = true;
                     idx++;
@@ -281,7 +281,7 @@ public class ServiceMain {
                 }
             }
 
-            if(ok == true){
+            if(ok){
                 userBankAccounts.get(idx).setBalance(userBankAccounts.get(idx).getBalance() + amount);
                 if(this.bankAccountDatabase!=null){
                     this.bankAccountDatabase.update(userBankAccounts.get(idx));
@@ -310,7 +310,7 @@ public class ServiceMain {
                 throw new Exception("Insufficient founds!");
 
             userBankAccounts.get(0).setBalance(userBankAccounts.get(0).getBalance() - amount);
-            IBAN = userBankAccounts.get(0).getIBAN();
+//            IBAN = userBankAccounts.get(0).getIBAN();
             if(this.bankAccountDatabase!=null){
                 this.bankAccountDatabase.update(userBankAccounts.get(0));
             }
@@ -321,7 +321,7 @@ public class ServiceMain {
             boolean ok = false;
             int idx = -1;
             for(BankAccount b : userBankAccounts){
-                if(IBAN == b.getIBAN())
+                if(IBAN.equals(b.getIBAN()))
                 {
                     ok = true;
                     idx++;
@@ -329,7 +329,7 @@ public class ServiceMain {
                 }
             }
 
-            if(ok == true){
+            if(ok){
                 amount = Integer.parseInt(cin.nextLine());
                 if(amount > userBankAccounts.get(idx).getBalance())
                     throw new Exception("Insufficient founds!");

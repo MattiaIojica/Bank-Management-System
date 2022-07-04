@@ -1,7 +1,7 @@
 package com.company.bank.bankaccount;
 
 import com.company.bank.card.Card;
-import com.company.bank.card.CardSingleton;
+import com.company.bank.card.CardFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -13,7 +13,7 @@ public class BankAccount {
     protected int ownerId;
 
     protected List<Card> cardList = new ArrayList<>();
-    private final CardSingleton cardSingleton = CardSingleton.getInstance();
+    private final CardFactory cardFactory = CardFactory.getInstance();
     static private final Set<String> usedNumbers = new HashSet<>();
 
     public BankAccount(String IBAN, double balance, int ownerId){
@@ -41,7 +41,7 @@ public class BankAccount {
 
 
     public Card addCard(){
-        Card card = cardSingleton.addCard(this.IBAN);
+        Card card = cardFactory.addCard(this.IBAN);
         cardList.add(card);
 
         return card;

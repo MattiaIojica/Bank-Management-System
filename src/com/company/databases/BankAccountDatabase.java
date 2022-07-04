@@ -2,6 +2,7 @@ package com.company.databases;
 
 import com.company.bank.bankaccount.BankAccount;
 import com.company.config.DatabaseConfig;
+import com.company.person.Person;
 
 import java.util.*;
 import java.sql.*;
@@ -42,13 +43,11 @@ public class BankAccountDatabase {
     public void insert(BankAccount bankAccount){
         String insertSQL = "INSERT INTO BankAccounts (IBAN, balance, ownerId) VALUES (?, ?, ?)";
 
-        try{
-            PreparedStatement prepareStatement = connection.prepareStatement(insertSQL);
+        try(PreparedStatement prepareStatement = connection.prepareStatement(insertSQL)){
             prepareStatement.setString(1, bankAccount.getIBAN());
             prepareStatement.setDouble(2, bankAccount.getBalance());
             prepareStatement.setInt(3, bankAccount.getOwnerId());
             prepareStatement.execute();
-            prepareStatement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }
@@ -73,13 +72,11 @@ public class BankAccountDatabase {
 
     public void update(BankAccount bankAccount){
         String updateSQL = "UPDATE BankAccounts SET balance = ?, ownerId = ? WHERE IBAN = ?";
-        try{
-            PreparedStatement prepareStatement = connection.prepareStatement(updateSQL);
+        try(PreparedStatement prepareStatement = connection.prepareStatement(updateSQL)){
             prepareStatement.setDouble(1, bankAccount.getBalance());
             prepareStatement.setInt(2, bankAccount.getOwnerId());
             prepareStatement.setString(3, bankAccount.getIBAN());
             prepareStatement.executeUpdate();
-            prepareStatement.close();
         }catch (Exception e){
             System.out.println(e.toString());
         }
@@ -96,5 +93,26 @@ public class BankAccountDatabase {
         }catch (Exception e){
             System.out.println(e.toString());
         }
+    }
+
+    public BankAccount getBankAccountByIban(String IBAN) {
+        String selectSql = "SELECT * FROM BankAccounts WHERE IBAN=?";
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(selectSql)) {
+            preparedStatement.setString(1, IBAN);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            return mapToBankAccount(resultSet);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private BankAccount mapToBankAccount(ResultSet resultSet) throws SQLException {
+        if (resultSet.next()) {
+            return new BankAccount(resultSet.getString(1), resultSet.getDouble(2), resultSet.getInt(3));
+        }
+        return null;
     }
 }

@@ -101,8 +101,7 @@ public abstract class Person {
 
     @Override
     public String toString() {
-        return "" +
-                ", firstName='" + firstName + '\'' +
+        return ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", CNP='" + CNP + '\'' +
                 ", email='" + email + '\'' +

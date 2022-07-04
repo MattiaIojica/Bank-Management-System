@@ -8,7 +8,7 @@ import java.util.*;
 
 public class TransactionDatabase {
 
-    private static Connection connection = DatabaseConfig.getDatabaseConnection();
+    private final Connection connection = DatabaseConfig.getDatabaseConnection();
     private static TransactionDatabase instance;
 
 
@@ -81,8 +81,7 @@ public class TransactionDatabase {
         String updateSQL = "UPDATE Transactions SET description = ? WHERE fromIBAN = ? AND toIBAN = ? AND dateT = ?";
 
         try{
-            java.util.Date d = (java.util.Date) transaction.getDate();
-            java.sql.Date sqlDate = new java.sql.Date(d.getTime());
+            java.util.Date d = transaction.getDate();
             java.sql.Timestamp sqlTime = new java.sql.Timestamp(d.getTime());
 
             PreparedStatement prepareStatement = connection.prepareStatement(updateSQL);
@@ -100,8 +99,7 @@ public class TransactionDatabase {
     public void delete(Transaction transaction){
         String deleteSQL = "DELETE FROM Transactions WHERE fromIBAN = ?, toIBAN = ?, dateT = ?";
         try{
-            java.util.Date d = (java.util.Date) transaction.getDate();
-            java.sql.Date sqlDate = new java.sql.Date(d.getTime());
+            java.util.Date d = transaction.getDate();
             java.sql.Timestamp sqlTime = new java.sql.Timestamp(d.getTime());
 
             PreparedStatement prepareStatement = connection.prepareStatement(deleteSQL);

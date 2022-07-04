@@ -8,7 +8,7 @@ public class ServiceAudit {
 
     private static ServiceAudit instance;
 
-    public ServiceAudit() {
+    private ServiceAudit() {
         try{
             this.fileWriter = new FileWriter("data/audit.csv");
         }catch (IOException e){

@@ -1,27 +1,25 @@
 package com.company.person.user;
 
-import com.company.databases.UserDatabase;
-
 import java.sql.*;
 import java.text.*;
 import java.util.*;
 
-public class UserSingleton {
-    private static UserSingleton instance;
+public class UserFactory {
+    private static UserFactory instance;
     private static int id = 0;
 
 
-    private UserSingleton(){}
+    private UserFactory(){}
 
-    public static UserSingleton getInstance() {
+    public static UserFactory getInstance() {
         if(instance == null){
-            instance = new UserSingleton();
+            instance = new UserFactory();
         }
         return instance;
     }
 
     public static void incrementId(int number){
-        UserSingleton.id = UserSingleton.id + number;
+        UserFactory.id = UserFactory.id + number;
     }
 
     public User createUser(Scanner cin) throws ParseException {
@@ -31,4 +29,5 @@ public class UserSingleton {
     public User createUser(ResultSet cin) throws SQLException {
         return new User(id++, cin);
     }
+
 }
