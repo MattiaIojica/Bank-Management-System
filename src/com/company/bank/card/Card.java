@@ -14,6 +14,14 @@ public class Card {
 
     static private final Set<String> usedNumbers = new HashSet<>();
 
+    public Card(int cardId, String cvv, String number, String IBAN, Date expirationDate) {
+        this.cardId = cardId;
+        this.cvv = cvv;
+        this.number = number;
+        this.IBAN = IBAN;
+        this.expirationDate = expirationDate;
+    }
+
     public Card(int cardId, String IBAN) {
         this.cardId = cardId;
         this.IBAN = IBAN;

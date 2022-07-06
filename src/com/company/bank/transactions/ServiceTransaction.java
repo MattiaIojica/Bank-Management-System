@@ -1,7 +1,5 @@
 package com.company.bank.transactions;
 
-import com.company.user.User;
-
 import java.io.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -12,6 +10,8 @@ public class ServiceTransaction {
 
     private List<Transaction> transactions = new ArrayList<>();
     private static ServiceTransaction instance;
+
+    private ServiceTransaction(){}
 
     public static ServiceTransaction getInstance() {
         if(instance == null)

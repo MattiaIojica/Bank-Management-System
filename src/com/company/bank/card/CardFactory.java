@@ -1,15 +1,23 @@
 package com.company.bank.card;
 
 
-import com.company.user.User;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.Scanner;
 
-public class CardSingleton {
+public class CardFactory {
     private static int id = 0;
+    private static CardFactory instance;
+
+    private CardFactory(){}
+
+    public static CardFactory getInstance() {
+        if(instance == null){
+            instance = new CardFactory();
+        }
+        return instance;
+    }
 
     public Card addCard(String IBAN){
         return new Card(id++, IBAN);

@@ -1,10 +1,7 @@
 package com.company;
 
 import com.company.audit.ServiceAudit;
-import com.company.databases.BankAccountDatabase;
-import com.company.databases.CardDatabase;
-import com.company.databases.TransactionDatabase;
-import com.company.databases.UserDatabase;
+import com.company.databases.*;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,20 +15,7 @@ public class Main {
     static List<String> commands = Arrays.asList("Create new user", "Print user", "Delete user", "Create Bank account",
             "Close Bank Account", "Create card", "Print User's Bank Accounts", "Create Transaction", "Deposit Money",
             "Withdraw Money", "Check Balance", "Print User Transactions", "Stop!");
-
-
-    public static Connection getConnection() {
-        try{
-            String url = "jdbc:mysql://localhost:3306/projectpao";
-            String user = "root";
-            String password = "pao2022rootQ";
-
-            return DriverManager.getConnection(url, user, password);
-        }catch (SQLException e){
-            System.out.println(e.toString());
-            return null;
-        }
-    }
+    
 
     private static void printAllCommands(){
 
@@ -45,14 +29,8 @@ public class Main {
 
         Scanner cin = new Scanner(System.in);
 
-        Connection connection = Main.getConnection();
-        BankAccountDatabase bankAccountDatabase = new BankAccountDatabase(connection);
-        UserDatabase userDatabase = new UserDatabase(connection);
-        TransactionDatabase transactionDatabase = new TransactionDatabase(connection);
-        CardDatabase cardDatabase = new CardDatabase(connection);
-
-        ServiceMain serviceMain = new ServiceMain(userDatabase, bankAccountDatabase, transactionDatabase, cardDatabase);
-        ServiceAudit serviceAudit = new ServiceAudit();
+        ServiceMain serviceMain = ServiceMain.getInstance();
+        ServiceAudit serviceAudit = ServiceAudit.getInstance();
 
         boolean stop = false;
         while (stop != true) {

@@ -1,22 +1,16 @@
-package com.company.user;
-
-import com.company.bank.bankaccount.BankAccount;
-import com.company.bank.bankaccount.BankAccountSingleton;
-import com.company.bank.bankaccount.ServiceBankAccount;
+package com.company.person.user;
 
 import java.io.*;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
-public class ServiceUser {
+public class ServiceUser implements UserInterface {
 
     private List<User> users = new ArrayList<>();
     private static ServiceUser instance;
+
 
 
     public static ServiceUser getInstance() {
@@ -65,7 +59,7 @@ public class ServiceUser {
                 );
                 users.add(user);
             }
-            UserSingleton.incrementId(str.size());
+            UserFactory.incrementId(str.size());
         }catch (ParseException e){
             System.out.println(e.toString());
         }
@@ -82,5 +76,23 @@ public class ServiceUser {
         }catch (IOException e){
             System.out.println(e.toString());
         }
+    }
+
+
+    public List<User> getUsers(User user) {
+        return users;
+    }
+
+    public void deteleUser(User user){
+        for(int i = 0;i < this.users.size(); ++i){
+            if(this.users.get(i).equals(user)){
+                this.users.remove(i);
+                break;
+            }
+        }
+    }
+
+    public void addUser(User user){
+        this.users.add(user);
     }
 }
